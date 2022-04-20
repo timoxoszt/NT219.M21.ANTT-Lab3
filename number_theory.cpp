@@ -12,18 +12,31 @@ int gcd(int a, int b) {
       b= t;
    }
 }
-int main() {
+int main() 
+{
+   double message;
+   cout<<"Nhap message: ";
+   cin>> message;
    //2 random prime numbers
-   double p = 13;
-   double q = 11;
+   double p;
+   cout<<"\nNhap p: ";
+   cin>>p;
+   double q;
+   cout<<"\nNhap q: ";
+   cin>>q;
    double n=p*q;//calculate n
+   cout<<"\nGia tri n = " << n;
    double track;
    double phi= (p-1)*(q-1);//calculate phi
+   cout<<"\nphi = "<< phi;
    //public key
    //e stands for encrypt
-   double e=7;
+   double e;
+   cout<<"\nNhap e: ";
+   cin>> e;
    //for checking that 1 < e < phi(n) and gcd(e, phi(n)) = 1; i.e., e and phi(n) are coprime.
-   while(e<phi) {
+   while(e<phi) 
+   {
       track = gcd(e,phi);
       if(track==1)
          break;
@@ -35,20 +48,13 @@ int main() {
    //choosing d such that it satisfies d*e = 1 mod phi
    double d1=1/e;
    double d=fmod(d1,phi);
-   double message = 123;
    double c = pow(message,e); //encrypt the message
    double m = pow(c,d);
    c=fmod(c,n);
    m=fmod(m,n);
-   cout<<"Original Message = "<<message;
-   cout<<"\n"<<"p = "<<p;
-   cout<<"\n"<<"q = "<<q;
-   cout<<"\n"<<"n = pq = "<<n;
-   cout<<"\n"<<"phi = "<<phi;
-   cout<<"\n"<<"e = "<<e;
    cout<<"\n"<<"d = "<<d;
    cout<<"\n"<<"Encrypted message = "<<c;
-   cout<<"\n"<<"Decrypted message = "<<m;
+   cout<<"\n"<<"Decrypted message = "<<m<<"\n";
    return 0;
 }
 
