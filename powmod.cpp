@@ -78,8 +78,10 @@ for (int i = res_size - 1; i >= 0; i--)
 
 // Driver program
 int main() {
-int exponent = 40;
-int base = 7;
+int exponent = 256;
+
+int base = 2;
+
 power(base, exponent);
 return 0;
 }

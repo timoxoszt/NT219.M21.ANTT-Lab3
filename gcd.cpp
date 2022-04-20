@@ -46,8 +46,9 @@ ll gcdLarge(ll a, char b[])
 int main()
 {
 	// first number which is integer
-	ll a = 978;
-
+	ll a;
+	cout <<"a: ";
+	cin >> a;
 	// second number is represented as string because
 	// it can not be handled by integer data type
 	char b[] = "89798763754892653453379597352537489494736";
