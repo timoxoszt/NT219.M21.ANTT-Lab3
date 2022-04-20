@@ -7,6 +7,20 @@ using namespace std;
 // output
 #define MAX 100000
 
+
+// Function to compute num (mod a)
+int mod(string num, int a)
+{
+	// Initialize result
+	int res = 0;
+
+	// One by one process all digits of 'num'
+	for (int i = 0; i < num.length(); i++)
+		res = (res * 10 + (int)num[i] - '0') % a;
+
+	return res;
+}
+
 // This function multiplies x
 // with the number represented by res[].
 // res_size is size of res[] or
@@ -71,15 +85,17 @@ while (temp != 0) {
 for (int i = 2; i <= n; i++)
 	res_size = multiply(x, res, res_size);
 
-cout << x << "^" << n << " = ";
+cout << x << "^" << n << "%19" << " = ";
+string ans = "";
 for (int i = res_size - 1; i >= 0; i--)
-	cout << res[i];
+	ans += to_string(res[i]);
+	cout << ans;
 }
+
 
 // Driver program
 int main() {
 int exponent = 256;
-
 int base = 2;
 
 power(base, exponent);
