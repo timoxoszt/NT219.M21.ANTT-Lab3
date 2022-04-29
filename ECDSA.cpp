@@ -16,7 +16,6 @@ using namespace std;
 using std::ostringstream;
 
 #include "cryptopp/osrng.h"
-// using CryptoPP::AutoSeededX917RNG;
 using CryptoPP::AutoSeededRandomPool;
 
 #include "cryptopp/aes.h"
@@ -82,7 +81,11 @@ using CryptoPP::Base64Encoder;
 /* standard curves*/
 #include <cryptopp/asn.h>
 
-// Vietnamese language library
+/*
+***************************
+*   SUPPORT VIETNAMESE   *
+***************************
+*/
 #include <fcntl.h>
 /* Convert string*/
 #include <locale>
@@ -90,8 +93,6 @@ using std::wstring_convert;
 #include <codecvt>
 using std::codecvt_utf8;
 
-// inputfile name
-// string inputfile, inputfile1;
 
 // Convert
 wstring string_to_wstring(const std::string &str);
@@ -122,9 +123,6 @@ bool VerifyMessage(const ECDSA<ECP, SHA256>::PublicKey &key, const string &messa
 
 void signingFunction();
 void verifyFunction();
-//////////////////////////////////////////
-// In 2010, use SHA-256 and P-256 curve
-//////////////////////////////////////////
 
 int main(int argc, char *argv[])
 {
@@ -147,24 +145,36 @@ int main(int argc, char *argv[])
     case 1:
     {
         wcout << L"---- Tạo key ----" << endl;
+        AutoSeededRandomPool prng;
+
+        ECDSA<ECP, SHA256>::PrivateKey privateKey;
+        ECDSA<ECP, SHA256>::PublicKey publicKey;
+
+        GeneratePrivateKey(CryptoPP::ASN1::secp256r1(), privateKey);
+        GeneratePublicKey(privateKey, publicKey);
+
+        PrintDomainParameters(publicKey);
+        PrintPrivateKey(privateKey);
+        PrintPublicKey(publicKey);
+        SavePrivateKey("ecc.private.der", privateKey);
+        SavePublicKey("ecc.public.der", publicKey);
         break;
     }
     case 2:
     {
-        wcout << L"---- Tạo chữ kí số ----" << endl;
-        signingFunction();
+        wcout  <<  L"---- Tạo chữ kí số ----"  <<  endl;
+        signingFunction();       
         break;
     }
     case 3:
     {
-        wcout << L"---- Kiểm tra chữ kí số ----" << endl;
+        wcout << L"---- Kiểm tra văn bản ----" << endl;
         verifyFunction();
         break;
     }
     default:
         break;
     }
-
     return 0;
 }
 
@@ -182,7 +192,7 @@ bool GeneratePublicKey(const ECDSA<ECP, SHA256>::PrivateKey &privateKey, ECDSA<E
 {
     AutoSeededRandomPool prng;
 
-    // Sanity check
+    // Check key
     assert(privateKey.Validate(prng, 3));
 
     privateKey.MakePublicKey(publicKey);
@@ -242,22 +252,22 @@ void PrintPublicKey(const ECDSA<ECP, SHA256>::PublicKey &key)
 
 void SavePrivateKey(const string &filename, const ECDSA<ECP, SHA256>::PrivateKey &key)
 {
-    key.Save(FileSink(filename.c_str(), true /*binary*/).Ref());
+    key.Save(FileSink(filename.c_str(), true).Ref());
 }
 
 void SavePublicKey(const string &filename, const ECDSA<ECP, SHA256>::PublicKey &key)
 {
-    key.Save(FileSink(filename.c_str(), true /*binary*/).Ref());
+    key.Save(FileSink(filename.c_str(), true).Ref());
 }
 
 void LoadPrivateKey(const string &filename, ECDSA<ECP, SHA256>::PrivateKey &key)
 {
-    key.Load(FileSource(filename.c_str(), true /*pump all*/).Ref());
+    key.Load(FileSource(filename.c_str(), true).Ref());
 }
 
 void LoadPublicKey(const string &filename, ECDSA<ECP, SHA256>::PublicKey &key)
 {
-    key.Load(FileSource(filename.c_str(), true /*pump all*/).Ref());
+    key.Load(FileSource(filename.c_str(), true).Ref());
 }
 
 bool SignMessage(const ECDSA<ECP, SHA256>::PrivateKey &key, const string &message, string &signature)
@@ -269,8 +279,8 @@ bool SignMessage(const ECDSA<ECP, SHA256>::PrivateKey &key, const string &messag
     StringSource(message, true,
                  new SignerFilter(prng,
                                   ECDSA<ECP, SHA256>::Signer(key),
-                                  new StringSink(signature)) // SignerFilter
-    );                                                       // StringSource
+                                  new StringSink(signature))
+    );
 
     return !signature.empty();
 }
@@ -282,7 +292,7 @@ bool VerifyMessage(const ECDSA<ECP, SHA256>::PublicKey &key, const string &messa
     StringSource(signature + message, true,
                  new SignatureVerificationFilter(
                      ECDSA<ECP, SHA256>::Verifier(key),
-                     new ArraySink((byte *)&result, sizeof(result))) // SignatureVerificationFilter
+                     new ArraySink((byte *)&result, sizeof(result)))
     );
 
     return result;
@@ -336,11 +346,8 @@ void signingFunction()
 {
     string signature, encode;
 
-    /* load message to sign */
     string message;
-    // wcout << L"Nhập tên file input: ";
-    // wcin >> inputfile;
-    FileSource("message.txt", true, new StringSink(message));
+    FileSource("input.txt", true, new StringSink(message));
     wcout << L"*** Dữ liệu nhập vào từ file "<< endl;
     wcout << string_to_wstring(message) << endl;
 
@@ -389,12 +396,12 @@ void verifyFunction()
     // Load public key
     string message_r, signature_r;
     // Message m, sinnature (r,s);
-    FileSource("message1.txt", true, new StringSink(message_r));
+    FileSource("check.txt", true, new StringSink(message_r));
     AutoSeededRandomPool prng;
     LoadPrivateKey("ecc.private.der", privateKeys);
 
     string message;
-    FileSource("message.txt", true, new StringSink(message));
+    FileSource("input.txt", true, new StringSink(message));
     signature.erase();
     StringSource(message, true,
                  new SignerFilter(prng,
@@ -409,7 +416,7 @@ void verifyFunction()
     );
     int start_s = clock();
     for (int i = 0; i < 100; i++)
-    { //
+    {
         result = VerifyMessage(publicKey_r, message_r, signature_r);
     }
     int stop_s = clock();
