@@ -101,40 +101,40 @@ ll return_prime(){
   std::uniform_int_distribution<long long unsigned> distribution8byte(-8000000000000000,8000000000000000);
   /*32 byte*/
   //std::uniform_int_distribution<int256_t> distribution32byte(-1000000000000000000,100000000000000000000000000000);
- for (int i=0;;++i){
-	ll num2byte1 = distribution2byte(generator);
-  ll num2byte2 = distribution2byte(generator);
-    int iteration = 10;
-    if (Miller(num2byte1, iteration) && Miller(num2byte2, iteration) ){
-      cout <<"2 byte prime number 1: " <<num2byte1<<endl;
-      cout <<"2 byte prime number 2: " <<num2byte2<<endl;      	
-      break;
-    }
-  }
+//  for (int i=0;;++i){
+// 	ll num2byte1 = distribution2byte(generator);
+//   ll num2byte2 = distribution2byte(generator);
+//     int iteration = 10;
+//     if (Miller(num2byte1, iteration) && Miller(num2byte2, iteration) ){
+//       cout <<"2 byte prime number 1: " <<num2byte1<<endl;
+//       cout <<"2 byte prime number 2: " <<num2byte2<<endl;      	
+//       break;
+//     }
+//   }
 
-   for (int i=0;;++i){
-	ll num8byte1 = distribution8byte(generator);
-	ll num8byte2 = distribution8byte(generator);
-    int iteration = 10;
-     if (Miller(num8byte1, iteration) && Miller(num8byte2, iteration) ){
-      cout <<"8 byte prime number 1: " <<num8byte1<<endl;
-      cout <<"8 byte prime number 2: " <<num8byte2<<endl;
-      break;
-    }
-  }
+//    for (int i=0;;++i){
+// 	ll num8byte1 = distribution8byte(generator);
+// 	ll num8byte2 = distribution8byte(generator);
+//     int iteration = 10;
+//      if (Miller(num8byte1, iteration) && Miller(num8byte2, iteration) ){
+//       cout <<"8 byte prime number 1: " <<num8byte1<<endl;
+//       cout <<"8 byte prime number 2: " <<num8byte2<<endl;
+//       break;
+//     }
+//   }
   return 0;
 }
 
 
 int main(){
-  return_prime();    
+  // return_prime();    
   ll num1,num2;
-  cout << "num 1: ";
-  cin>>num1;
-  cout<<"num2: ";
-  cin>>num2;
+  // cout << "num 1: ";
+  // cin>>num1;
+  // cout<<"num2: ";
+  // cin>>num2;
    ll z, u;
-  	      cout << "gcd:  " << gcdExtended(num1, num2, &z, &u) << endl;
+  	    cout << "gcd:  " << gcdExtended(202064817326236237215516372374425601454450567536320501057581632121836802436302, 238851662336168688348187377135764266587223572768026845382310254254606634108132, &z, &u) << endl;
 	      cout << endl;
   return 0;
 }
