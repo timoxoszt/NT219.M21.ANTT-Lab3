@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-int cal(int a, int x, int p)      // work out c^d mod n
+int cal(int a, int x, int p)      // a * b ≡ [(a mod n) * (b mod n)] mod n
 {
     int res = 1;
     while (x > 0)
