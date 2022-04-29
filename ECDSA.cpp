@@ -1,4 +1,3 @@
-/* Source, Sink */
 #include <iomanip>
 #include "cryptopp/modes.h"
 #include <assert.h>
@@ -45,22 +44,21 @@ using CryptoPP::FileSource;
 
 #include <ctime>
 
-//Genererate keys
+// Genererate keys
 #include "cryptopp/cryptlib.h"
 using CryptoPP::DecodingResult;
 using CryptoPP::Exception;
 using CryptoPP::PrivateKey;
 using CryptoPP::PublicKey;
 
-/*Reading key input from file*/
+// Load key value from file
 #include <cryptopp/queue.h>
 using CryptoPP::ByteQueue;
 
-/* convert string stream */
 #include <sstream>
 using std::ostringstream;
 
-// ECC crypto
+// ECC
 #include "cryptopp/eccrypto.h"
 using CryptoPP::DL_GroupParameters_EC;
 using CryptoPP::ECDSA;
@@ -78,7 +76,6 @@ using CryptoPP::HexEncoder;
 using CryptoPP::Base64Decoder;
 using CryptoPP::Base64Encoder;
 
-/* standard curves*/
 #include <cryptopp/asn.h>
 
 /*
@@ -86,15 +83,13 @@ using CryptoPP::Base64Encoder;
 *   SUPPORT VIETNAMESE   *
 ***************************
 */
+
 #include <fcntl.h>
-/* Convert string*/
 #include <locale>
 using std::wstring_convert;
 #include <codecvt>
 using std::codecvt_utf8;
 
-
-// Convert
 wstring string_to_wstring(const std::string &str);
 string wstring_to_string(const std::wstring &str);
 wstring integer_to_wstring(const CryptoPP::Integer &t);
@@ -192,7 +187,7 @@ bool GeneratePublicKey(const ECDSA<ECP, SHA256>::PrivateKey &privateKey, ECDSA<E
 {
     AutoSeededRandomPool prng;
 
-    // Check key
+    // Validate key
     assert(privateKey.Validate(prng, 3));
 
     privateKey.MakePublicKey(publicKey);
@@ -298,20 +293,22 @@ bool VerifyMessage(const ECDSA<ECP, SHA256>::PublicKey &key, const string &messa
     return result;
 }
 
-/* convert string to wstring */
+/*
+********************************
+* Convert to wstring UTF-8 Vietnamese  *
+********************************
+*/ 
 wstring string_to_wstring(const std::string &str)
 {
     wstring_convert<codecvt_utf8<wchar_t>> towstring;
     return towstring.from_bytes(str);
 }
 
-/* convert wstring to string */
 string wstring_to_string(const std::wstring &str)
 {
     wstring_convert<codecvt_utf8<wchar_t>> tostring;
     return tostring.to_bytes(str);
 }
-// Conver integer to string and wstring;
 wstring integer_to_wstring(const CryptoPP::Integer &t)
 {
     std::ostringstream oss;
@@ -345,82 +342,75 @@ string integer_to_hex(const CryptoPP::Integer &t)
 void signingFunction()
 {
     string signature, encode;
-
     string message;
     FileSource("input.txt", true, new StringSink(message));
-    wcout << L"*** Dữ liệu nhập vào từ file "<< endl;
+    wcout << L"*** Dữ liệu nhập vào từ file ***"<< endl;
     wcout << string_to_wstring(message) << endl;
-
+    wcout<<"===================================="<<endl;
     int message_size = sizeof(message);
 
-    ECDSA<ECP, SHA256>::PrivateKey privateKeys;
+    ECDSA<ECP, SHA256>::PrivateKey Privatekey_val;
+    LoadPrivateKey("ecc.private.der", Privatekey_val);
+    
+    wcout << "p = " << integer_to_wstring(Privatekey_val.GetGroupParameters().GetCurve().GetField().GetModulus()) << endl;
+    wcout << "d = " << integer_to_wstring(Privatekey_val.GetPrivateExponent()) << endl;
 
-    LoadPrivateKey("ecc.private.der", privateKeys);
-    //Print system parmeters
-    wcout << "Prime number p=" << integer_to_wstring(privateKeys.GetGroupParameters().GetCurve().GetField().GetModulus()) << endl;
-    wcout << "Secret key d:" << integer_to_wstring(privateKeys.GetPrivateExponent()) << endl;
-
-    /* Siging message
-     - shor-term key (k, k.G);
-     - 0 < k < n; kG = (x1, y1), r=x1;
-     - compute (r,s)
-     s= k^-1(H(m)+ d.r) mod n;
-     output (r, s); 
-     */
-    int start_s = clock();
+    int start_time = clock();
     for (int i = 0; i < 100; i++)
     {
         AutoSeededRandomPool prng;
         signature.erase();
         StringSource(message, true,
                      new SignerFilter(prng,
-                                      ECDSA<ECP, SHA256>::Signer(privateKeys),
+                                      ECDSA<ECP, SHA256>::Signer(Privatekey_val),
                                       new Base64Encoder(new StringSink(signature))));
     }
-    int stop_s = clock();
-    double total = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 100;
-    wcout << "signature (r,s):" << string_to_wstring(signature) << endl;
-    wcout << L"Kiểm tra sau 100 lần chạy: " << total << " ms" << endl;
-    wcout << L"Thời gian thực thi trung bình: " << total / 100 << " ms" << endl;
+    int stop_time = clock();
+    double time = (stop_time - start_time) / double(CLOCKS_PER_SEC) * 100;
+
+    wcout << L"Chữ ký:" << string_to_wstring(signature) << endl;
+    wcout << L"Thời gian trung bình 100 lần chạy: " << time << " ms" << endl;
+    wcout << L"Thời gian mã hóa: " << time / 100 << " ms" << endl;
 }
 void verifyFunction()
 {
     string signature, encode;
     bool result;
     result = false;
-    // Public key variable
-    ECDSA<ECP, SHA256>::PublicKey publicKey_r;
-    ECDSA<ECP, SHA256>::PrivateKey privateKeys;
+    
+    // Load key value
+    ECDSA<ECP, SHA256>::PublicKey Publickey_val;
+    ECDSA<ECP, SHA256>::PrivateKey Privatekey_val;
 
-    LoadPublicKey("ecc.public.der", publicKey_r);
-    // Load public key
-    string message_r, signature_r;
-    // Message m, sinnature (r,s);
-    FileSource("check.txt", true, new StringSink(message_r));
+    LoadPublicKey("ecc.public.der", Publickey_val);
+
+    
+    string check_val, signature_val;
+
+    FileSource("check.txt", true, new StringSink(check_val));
     AutoSeededRandomPool prng;
-    LoadPrivateKey("ecc.private.der", privateKeys);
+    LoadPrivateKey("ecc.private.der", Privatekey_val);
 
     string message;
     FileSource("input.txt", true, new StringSink(message));
     signature.erase();
     StringSource(message, true,
                  new SignerFilter(prng,
-                                  ECDSA<ECP, SHA256>::Signer(privateKeys),
+                                  ECDSA<ECP, SHA256>::Signer(Privatekey_val),
                                   new Base64Encoder(new StringSink(signature))));
-    cout << "Signature on message m=" << signature.data() << endl;
+    wcout << L"*** Nội dung chữ ký *** " << signature.data() << endl;
 
-    // Hex decode signature
     StringSource ss(signature, true,
                     new Base64Decoder(
-                        new StringSink(signature_r)) // HexDecoder
+                        new StringSink(signature_val))
     );
-    int start_s = clock();
+    int start_time = clock();
     for (int i = 0; i < 100; i++)
     {
-        result = VerifyMessage(publicKey_r, message_r, signature_r);
+        result = VerifyMessage(Publickey_val, check_val, signature_val);
     }
-    int stop_s = clock();
-    double total = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
+    int stop_time = clock();
+    double time = (stop_time - start_time) / double(CLOCKS_PER_SEC) * 1000;
     
     string check_status;
 
@@ -430,6 +420,6 @@ void verifyFunction()
         wcout << L"Xác minh chữ kí số: Không chính xác" << endl;
     }
 
-    wcout << L"Kiểm tra sau 100 lần chạy: " << total << " ms" << endl;
-    wcout << L"Thời gian thực thi trung bình: " << total / 100 << " ms" << endl;
+    wcout << L"Thời gian trung bình 100 lần chạy: " << time << " ms" << endl;
+    wcout << L"Thời gian giải mã: " << time / 100 << " ms" << endl;
 }
