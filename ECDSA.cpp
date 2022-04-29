@@ -116,8 +116,8 @@ void PrintPublicKey(const ECDSA<ECP, SHA256>::PublicKey &key);
 bool SignMessage(const ECDSA<ECP, SHA256>::PrivateKey &key, const string &message, string &signature);
 bool VerifyMessage(const ECDSA<ECP, SHA256>::PublicKey &key, const string &message, const string &signature);
 
-void signingFunction();
-void verifyFunction();
+void SignFunction();
+void VerifyFunction();
 
 int main(int argc, char *argv[])
 {
@@ -158,13 +158,13 @@ int main(int argc, char *argv[])
     case 2:
     {
         wcout  <<  L"---- Tạo chữ kí số ----"  <<  endl;
-        signingFunction();       
+        SignFunction();       
         break;
     }
     case 3:
     {
         wcout << L"---- Kiểm tra văn bản ----" << endl;
-        verifyFunction();
+        VerifyFunction();
         break;
     }
     default:
@@ -272,9 +272,9 @@ bool SignMessage(const ECDSA<ECP, SHA256>::PrivateKey &key, const string &messag
     signature.erase();
 
     StringSource(message, true,
-                 new SignerFilter(prng,
-                                  ECDSA<ECP, SHA256>::Signer(key),
-                                  new StringSink(signature))
+        new SignerFilter(prng,
+        ECDSA<ECP, SHA256>::Signer(key),
+        new StringSink(signature))
     );
 
     return !signature.empty();
@@ -339,7 +339,7 @@ string integer_to_hex(const CryptoPP::Integer &t)
     std::string encoded(oss.str());
     return encoded;
 }
-void signingFunction()
+void SignFunction()
 {
     string signature, encode;
     string message;
@@ -355,15 +355,16 @@ void signingFunction()
     wcout << "p = " << integer_to_wstring(Privatekey_val.GetGroupParameters().GetCurve().GetField().GetModulus()) << endl;
     wcout << "d = " << integer_to_wstring(Privatekey_val.GetPrivateExponent()) << endl;
 
+     // Execute time
     int start_time = clock();
     for (int i = 0; i < 100; i++)
     {
         AutoSeededRandomPool prng;
         signature.erase();
         StringSource(message, true,
-                     new SignerFilter(prng,
-                                      ECDSA<ECP, SHA256>::Signer(Privatekey_val),
-                                      new Base64Encoder(new StringSink(signature))));
+            new SignerFilter(prng,
+            ECDSA<ECP, SHA256>::Signer(Privatekey_val),
+            new Base64Encoder(new StringSink(signature))));
     }
     int stop_time = clock();
     double time = (stop_time - start_time) / double(CLOCKS_PER_SEC) * 100;
@@ -372,7 +373,7 @@ void signingFunction()
     wcout << L"Thời gian trung bình 100 lần chạy: " << time << " ms" << endl;
     wcout << L"Thời gian mã hóa: " << time / 100 << " ms" << endl;
 }
-void verifyFunction()
+void VerifyFunction()
 {
     string signature, encode;
     bool result;
@@ -382,11 +383,9 @@ void verifyFunction()
     ECDSA<ECP, SHA256>::PublicKey Publickey_val;
     ECDSA<ECP, SHA256>::PrivateKey Privatekey_val;
 
-    LoadPublicKey("ecc.public.der", Publickey_val);
+    LoadPublicKey("ecc.public.der", Publickey_val);    
 
-    
     string check_val, signature_val;
-
     FileSource("check.txt", true, new StringSink(check_val));
     AutoSeededRandomPool prng;
     LoadPrivateKey("ecc.private.der", Privatekey_val);
@@ -395,15 +394,17 @@ void verifyFunction()
     FileSource("input.txt", true, new StringSink(message));
     signature.erase();
     StringSource(message, true,
-                 new SignerFilter(prng,
-                                  ECDSA<ECP, SHA256>::Signer(Privatekey_val),
-                                  new Base64Encoder(new StringSink(signature))));
+        new SignerFilter(prng,
+        ECDSA<ECP, SHA256>::Signer(Privatekey_val),
+        new Base64Encoder(new StringSink(signature))));
     wcout << L"*** Nội dung chữ ký *** " << signature.data() << endl;
 
     StringSource ss(signature, true,
-                    new Base64Decoder(
-                        new StringSink(signature_val))
+        new Base64Decoder(
+        new StringSink(signature_val))
     );
+
+    // Execute time
     int start_time = clock();
     for (int i = 0; i < 100; i++)
     {
