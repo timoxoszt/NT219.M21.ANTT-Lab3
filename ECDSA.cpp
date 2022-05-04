@@ -44,20 +44,6 @@ using CryptoPP::FileSource;
 
 #include <ctime>
 
-/*
-* Tạo khóa ECDSA. Bên A thực hiện như sau:
-
-1. Chọn một đường onge lip E được xác định trên ℤp.
-
-Số lượng điểm trong E (ℤp) nên chia hết cho một số nguyên tố r lớn.
-
-2. Chọn một điểm cơ bản G ∈ E (p) của thứ tự r (có nghĩa là rG = 𝒪).
-
-3. Chọn một số nguyên s ngẫu nhiên trong khoảng [1, r – 1].
-
-4. Tính W = sG. Khóa chung là (E, G, r, W), khóa riêng là s.
-*/
-
 // Genererate keys
 #include "cryptopp/cryptlib.h"
 using CryptoPP::DecodingResult;
@@ -94,7 +80,7 @@ using CryptoPP::Base64Encoder;
 
 /*
 ***************************
-*   SUPPORT VIETNAMESE   *
+*   SUPPORT VIETNAMESE    *
 ***************************
 */
 
@@ -153,6 +139,20 @@ int main(int argc, char *argv[])
     {
     case 1:
     {
+        /*
+        * Tạo khóa ECDSA. Bên A thực hiện như sau:
+
+        1. Chọn một đường onge lip E được xác định trên ℤp.
+
+        Số lượng điểm trong E (ℤp) nên chia hết cho một số nguyên tố r lớn.
+
+        2. Chọn một điểm cơ bản G ∈ E (p) của thứ tự r (có nghĩa là rG = 𝒪).
+
+        3. Chọn một số nguyên s ngẫu nhiên trong khoảng [1, r – 1].
+
+        4. Tính W = sG. Khóa chung là (E, G, r, W), khóa riêng là s.
+        */
+
         wcout << L"---- Tạo key ----" << endl;
         AutoSeededRandomPool prng;
 
@@ -308,9 +308,9 @@ bool VerifyMessage(const ECDSA<ECP, SHA256>::PublicKey &key, const string &messa
 }
 
 /*
-********************************
+****************************************
 * Convert to wstring UTF-8 Vietnamese  *
-********************************
+****************************************
 */ 
 wstring string_to_wstring(const std::string &str)
 {
