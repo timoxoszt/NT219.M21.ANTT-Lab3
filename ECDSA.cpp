@@ -44,6 +44,20 @@ using CryptoPP::FileSource;
 
 #include <ctime>
 
+/*
+* Tạo khóa ECDSA. Bên A thực hiện như sau:
+
+1. Chọn một đường onge lip E được xác định trên ℤp.
+
+Số lượng điểm trong E (ℤp) nên chia hết cho một số nguyên tố r lớn.
+
+2. Chọn một điểm cơ bản G ∈ E (p) của thứ tự r (có nghĩa là rG = 𝒪).
+
+3. Chọn một số nguyên s ngẫu nhiên trong khoảng [1, r – 1].
+
+4. Tính W = sG. Khóa chung là (E, G, r, W), khóa riêng là s.
+*/
+
 // Genererate keys
 #include "cryptopp/cryptlib.h"
 using CryptoPP::DecodingResult;
@@ -339,6 +353,19 @@ string integer_to_hex(const CryptoPP::Integer &t)
     std::string encoded(oss.str());
     return encoded;
 }
+
+/*
+* Tính toán chữ ký ECDSA. Để ký một tin nhắn m, A thực hiện như sau:
+
+1. Tính toán đại diện tin nhắn f = H (m), sử dụng hàm băm mật mã. Lưu ý rằng f có thể lớn hơn r nhưng không dài hơn (bit đo).
+
+2. Chọn một số nguyên u ngẫu nhiên trong khoảng [1, r – 1].
+
+3. Tính V = uG = (xV, yV) và c ≡ xV mod r (goto (2) nếu c = 0).
+
+4. Tính d ≡ u-1*(f + s*Pc) mod r (2) nếu d = 0). Chữ ký cho tin nhắn m là cặp số nguyên (c, d).
+*/
+
 void SignFunction()
 {
     string signature, encode;
@@ -373,6 +400,19 @@ void SignFunction()
     wcout << L"Thời gian trung bình 100 lần chạy: " << time << " ms" << endl;
     wcout << L"Thời gian mã hóa: " << time / 100 << " ms" << endl;
 }
+
+/*
+* Xác minh chữ ký ECDSA. Để xác minh chữ ký của A, B nên làm như sau:
+
+1. Lấy bản sao xác thực của khóa công khai của A (E, G, r, W). Xác minh rằng c và d là các số nguyên trong khoảng [1, r – 1].
+
+2. Tính f = H (m) và h ≡ d-1 mod r.
+
+3. Tính h1 f *h mod r và h2 c*h mod r.
+
+4. Tính h1G + h2W = (x1, y1) và c1 ≡ x1 mod r. Chấp nhận chữ ký khi và chỉ khi c1 = c.
+*/
+
 void VerifyFunction()
 {
     string signature, encode;
