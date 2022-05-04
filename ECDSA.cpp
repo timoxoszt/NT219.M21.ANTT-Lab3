@@ -437,7 +437,6 @@ void VerifyFunction()
         new SignerFilter(prng,
         ECDSA<ECP, SHA256>::Signer(Privatekey_val),
         new Base64Encoder(new StringSink(signature))));
-    wcout << L"*** Nội dung chữ ký *** " << signature.data() << endl;
 
     StringSource ss(signature, true,
         new Base64Decoder(
