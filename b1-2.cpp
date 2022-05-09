@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <cstdlib>
 using namespace std;
@@ -410,16 +410,22 @@ bool BigInt::greater(const vector<char>& number1, const vector<char>& number2)
     return false;
 }
 
+BigInt gcd(BigInt a, BigInt b) 
+{
+    BigInt tmp;
+    while (b != 0) 
+    {
+        tmp = a % b;
+        a = b;
+        b = tmp;
+    }
+    return a;
+}
 
 int main()
 {
     BigInt a, b;
     cin >> a >> b;
-    while (a * b != 0)
-    {
-        if (a > b) a = a % b;
-        else b = b % a;
-    }
-    cout << b;
+    cout << gcd(a,b); 
+    return 0;
 }
-
