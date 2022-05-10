@@ -39,7 +39,30 @@ using CryptoPP::StringSink;
 using CryptoPP::StringSource;
 
 #include "cryptopp/files.h"
+/*
+FileSink cho phép bạn ghi dữ liệu vào một tệp bằng cách sử dụng BufferedTransformation. 
+Bạn có thể chuyển một cái hiện có ostreamvà thư viện sẽ ghi vào nó. 
+Hoặc bạn có thể yêu cầu thư viện mở ostreamcho bạn (trong trường hợp đó tệp được mở bằng ios::trunc).
+
+FileSink (std :: ostream & out)
+FileSink (const char * tên tệp, bool binary = true)
+*/
 using CryptoPP::FileSink;
+
+/*
+FileSource cho phép bạn đọc dữ liệu từ một tệp bằng cách sử dụng BufferedTransformation. 
+Bạn có thể vượt qua một hiện có istreamvà thư viện sẽ đọc từ đó. 
+Hoặc bạn có thể yêu cầu thư viện mở istreamcho bạn.
+
+FileSource (BufferedTransformation *attachment=NULL)
+FileSource (std::istream &in,
+            bool pumpAll,
+            BufferedTransformation *attachment=NULL)
+FileSource (const char *filename,
+            bool pumpAll,
+            BufferedTransformation *attachment=NULL,
+            bool binary=true)
+*/
 using CryptoPP::FileSource;
 
 #include <ctime>
